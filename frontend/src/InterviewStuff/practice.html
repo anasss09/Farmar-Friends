@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Interview Practice</title>
+</head>
+
+<body>
+
+    <ul id="profile-pictures">
+        <li><img src="https://up.yimg.com/ib/th/id/OIP.Mvcr0QDsGXOx29cSBfXd6AHaE7?pid=Api&rs=1&c=1&qlt=95&w=147&h=98"
+                alt="Profile Picture 1"> <span class="username">John Doe</span></li>
+        <li><img src="https://up.yimg.com/ib/th/id/OIP.Mvcr0QDsGXOx29cSBfXd6AHaE7?pid=Api&rs=1&c=1&qlt=95&w=147&h=98"
+                alt="Profile Picture 2"> <span class="username">Jane Smith</span></li>
+    </ul>
+
+    <script>
+        function profileTooltip() {
+            const profilePictures = document.querySelectorAll('#profile-pictures li')
+
+            profilePictures.forEach(item => {
+                const img = item.querySelector('img')
+                const username = item.querySelector('.username').innerText
+
+                img.addEventListener('mouseenter', () => {
+                    const tooltip = document.createElement('div')
+
+                    tooltip.textContent = username;
+                    tooltip.style.fontSize = '20px';
+                    tooltip.style.color = 'white';
+                    tooltip.style.background = 'black';
+                    tooltip.style.position = 'absolute';
+                    tooltip.style.padding = '20px 10px';
+
+                    const rect = img.getBoundingClientRect();
+
+                    tooltip.style.top = (rect.top + window.scrollY - 30) + 'px'
+                    tooltip.style.left = (rect.left + window.scrollX) + 'px'
+
+                    tooltip.style.zIndex = 1000
+                    document.body.appendChild(tooltip)
+
+                    img.addEventListener('mouseleave', () => {
+                        tooltip.remove()
+                    })
+                })
+            })
+        }
+
+        profileTooltip()
+    </script>
+
+</body>
+
+</html>
+
+<!-- 
+        // function addProfileTooltips() {
+        //     const profileItems = document.querySelectorAll('#profile-pictures li');
+        //     document.querySelectorAll('.username').forEach(span => {
+        //         span.style.display = 'none';
+        //     });
+
+        //     profileItems.forEach(item => {
+        //         const image = item.querySelector('img')
+        //         const username = item.querySelector('.username').innerText;
+
+        //         image.addEventListener('mouseenter', () => {
+        //             const tooltip = document.createElement('div')
+        //             tooltip.classList.add('tooltip')
+        //             tooltip.innerText = username
+
+        //             // Position tooltip near image
+        //             tooltip.style.position = 'absolute';
+        //             tooltip.style.background = '#333';
+        //             tooltip.style.color = '#fff';
+        //             tooltip.style.padding = '5px 10px';
+        //             tooltip.style.borderRadius = '4px';
+        //             tooltip.style.fontSize = '12px';
+        //             tooltip.style.whiteSpace = 'nowrap';
+        //             tooltip.style.top = (image.getBoundingClientRect().top + window.scrollY - 30) + 'px';
+        //             tooltip.style.left = (image.getBoundingClientRect().left + window.scrollX) + 'px';
+        //             tooltip.style.zIndex = '1000';
+
+        //             document.body.appendChild(tooltip);
+
+        //             // Store tooltip reference
+        //             image._tooltip = tooltip;
+
+        //         })
+
+        //         image.addEventListener('mouseleave', () => {
+        //             if (image._tooltip) {
+        //                 image._tooltip.remove();
+        //                 image._tooltip = null;
+        //             }
+        //         });
+        //     })
+        // }
+
+        // addProfileTooltips() -->

@@ -1,0 +1,24 @@
+Features List
+1. Crop Suitable Assessment.
+
+    - Get location (city/country) → lat/lon via OpenCage
+    - Get weather (rainfall, temperature) → OpenWeatherMap
+    - Get soil data → SoilGrids
+    - Get pest threat → FarmSense
+    - Based on all → Recommend crop or farming action
+
+2. Irrigation Schedule Recommendations:
+    - Get pest threat → FarmSense
+
+3. Weather forcast
+    - OpenWeatherMap
+
+4. Resource Management Tips:
+    - Get pest threat → FarmSense
+
+5. Community Form:
+    - From Sockets (Group Chat).
+    - Maybe Quora type (Q & A) platform.
+
+6. Alert and Notification:
+    - Nodemaller Maybe
