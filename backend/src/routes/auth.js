@@ -1,8 +1,7 @@
 import express from 'express'
-import { getLogout, postLogin, postSignup } from '../controller/auth.js';
+import { getLogout, postLogin, postSignup, getGoogleCallback } from '../controller/auth.js';
 import upload from '../utils/multer.js';
 import passport from "passport";
-import { googleCallback } from '../controller/auth.js';
 
 const router = express.Router()
 
@@ -17,7 +16,7 @@ router.get("/google", passport.authenticate("google", { scope: ["profile", "emai
 router.get(
   "/google/callback",
   passport.authenticate("google", { session: false }),
-  googleCallback
+  getGoogleCallback
 );
 
 

@@ -128,7 +128,7 @@ export const postLogin = ErrorWrapper(async (req, res, next) => {
 })
 
 // Google Login
-export const googleCallback = async (req, res) => {
+export const getGoogleCallback = async (req, res) => {
     try {
         const user = req.user;
 
