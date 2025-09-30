@@ -19,7 +19,6 @@ const userSchema = new Schema({
     },
     password: {
         type: String,
-        required: true,
         trim: true
     },
     name: {
@@ -31,6 +30,9 @@ const userSchema = new Schema({
         type: String
     },
     refreshToken: {
+        type: String
+    },
+    googleId: {
         type: String
     }
 })

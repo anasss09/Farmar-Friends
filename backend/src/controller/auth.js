@@ -127,11 +127,44 @@ export const postLogin = ErrorWrapper(async (req, res, next) => {
     }
 })
 
+// Google Login
+export const googleCallback = async (req, res) => {
+    try {
+        const user = req.user;
+
+        const { accessToken, refreshToken } = await generateAccessAndRefreshToken(user._id);
+
+        user.refreshToken = refreshToken;
+        await user.save();
+
+        res
+            .cookie("AccessToken", accessToken, {
+                httpOnly: true,
+                secure: true,
+                sameSite: "None",
+            })
+            .cookie("RefreshToken", refreshToken, {
+                httpOnly: true,
+                secure: true,
+                sameSite: "None",
+            })
+            .json({
+                success: true,
+                message: "Google login successful",
+                User: user
+            });
+    } catch (err) {
+        console.error(err);
+        res.status(500).json({ success: false, message: "Google login failed" });
+    }
+};
+
+
 export const getLogout = ErrorWrapper(async (req, res, next) => {
     res.status(200)
         .cookie('AccessToken', '', {
             httpOnly: true,
-            secure: false, 
+            secure: false,
             sameSite: "Lax",
             path: '/',
             expires: new Date(0)
