@@ -22,3 +22,13 @@ Features List
 
 6. Alert and Notification:
     - Nodemaller Maybe
+
+
+/auth - User authentication ✔️
+/api/users - User management ✔️
+/api/farms - Farm data management 
+/api/crops - Crop recommendations
+/api/weather - Weather integration
+/api/forum - Community forum
+/api/analytics - Data visualization
+/api/inventory - Inventory management

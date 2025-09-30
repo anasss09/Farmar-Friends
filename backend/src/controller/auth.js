@@ -3,13 +3,6 @@ import ErrorWrapper from "../utils/ErrorWrapper.js";
 import User from '../model/auth.js'
 import uploadOnCloudinary from "../utils/upload.js";
 
-
-export const home = (req, res) => {
-
-    console.log('hii am route');
-    res.send('Hii am Slash route')
-}
-
 export const postSignup = ErrorWrapper(async (req, res, next) => {
     try {
         const { username, email, password, name } = req.body;
@@ -112,24 +105,46 @@ export const postLogin = ErrorWrapper(async (req, res, next) => {
         }).select('-password -refreshToken')
 
         res.status(200)
-        .cookie('AcessToken', accessToken, {
-            httpOnly: true,
-            secure: true,
-            sameSite: "None",
-            path: '/'
-        })
-        .cookie('RefreshToken', refreshToken, {
-            httpOnly: true,
-            secure: true,
-            sameSite: "None",
-            path: '/'
-        }).json({
-            success: true,
-            message: 'Login Successful',
-            User: user
-        })
+            .cookie('AccessToken', accessToken, {
+                httpOnly: true,
+                secure: true,
+                sameSite: "None",
+                path: '/'
+            })
+            .cookie('RefreshToken', refreshToken, {
+                httpOnly: true,
+                secure: true,
+                sameSite: "None",
+                path: '/'
+            }).json({
+                success: true,
+                message: 'Login Successful',
+                User: user
+            })
 
     } catch (error) {
         throw new ErrorHandler(error.statusCode || 500, `Error in Login ${error}`)
     }
 })
+
+export const getLogout = ErrorWrapper(async (req, res, next) => {
+    res.status(200)
+        .cookie('AccessToken', '', {
+            httpOnly: true,
+            secure: false, 
+            sameSite: "Lax",
+            path: '/',
+            expires: new Date(0)
+        })
+        .cookie('RefreshToken', '', {
+            httpOnly: true,
+            secure: false,
+            sameSite: "Lax",
+            path: '/',
+            expires: new Date(0)
+        })
+        .json({
+            success: true,
+            message: 'Logout Successful',
+        });
+});
