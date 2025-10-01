@@ -170,26 +170,24 @@ export const postAddForum = ErrorWrapper(async (req, res, next) => {
         const username = user.name;
         const userImage = user.image;
 
-        if(!message) {
+        if (!message) {
             throw new ErrorHandler(404, "Enter message")
         }
-    
+
         const farmer = await Farmer.findOne({ userId: user._id })
 
-        if(!farmer) {
+        if (!farmer) {
             throw new ErrorHandler(404, 'Error in Forum, Farmer not found')
         }
 
-        console.log(farmer.userId.toString() )
-
-        if(farmer.userId.toString() !== user._id.toString()) {
+        if (farmer.userId.toString() !== user._id.toString()) {
             throw new ErrorHandler(401, 'You are not Authorised to perform this task')
         }
 
         const response = await uploadBatchOnCloudinary(req.files);
         const imageUrl = []
 
-        for(let i=0; i< response.length; i++) {
+        for (let i = 0; i < response.length; i++) {
             imageUrl.push({
                 url: response[i].url
             })
@@ -218,5 +216,86 @@ export const postAddForum = ErrorWrapper(async (req, res, next) => {
 })
 
 export const postUpdateForum = ErrorWrapper(async (req, res, next) => {
+    try {
+        const { forumId, message } = req.body;
+        const user = req.user;
 
+        if (!forumId) {
+            throw new ErrorHandler(404, "Forum Id not found, please provide valid ID");
+        }
+        if (!message) {
+            throw new ErrorHandler(404, "Message not received, please type a valid message");
+        }
+
+        const farmer = await Farmer.findOne({ userId: user._id });
+
+        if (!farmer) {
+            throw new ErrorHandler(404, "Error in Forum, Farmer not found");
+        }
+
+        if (farmer.userId.toString() !== user._id.toString()) {
+            throw new ErrorHandler(401, "You are not Authorised to perform this task");
+        }
+
+        const forum = farmer.forumPost.id(forumId);
+        if (!forum) {
+            throw new ErrorHandler(404, "Forum post not found");
+        }
+
+        let imageUrl = forum.images;
+        if (req.files && req.files.length > 0) {
+            const response = await uploadBatchOnCloudinary(req.files);
+            imageUrl = response.map((file) => ({ url: file.url }));
+        }
+
+        forum.message = message;
+        forum.images = imageUrl;
+        forum.username = user.name;
+        forum.userImage = user.image;
+
+        await farmer.save();
+
+        res.status(200).json({
+            success: true,
+            message: "Message updated successfully",
+            updatedForum: forum,
+        });
+    } catch (error) {
+        throw new ErrorHandler(error.statusCode || 500, error.message);
+    }
+});
+
+export const postDeleteForum = ErrorWrapper(async (req, res, next) => {
+    try {
+        const { forumId } = req.body;
+        const user = req.user
+
+        if (!forumId) {
+            throw new ErrorHandler(404, "Id not found")
+        }
+
+        const farmer = await Farmer.findOne({ userId: user._id })
+        if (!farmer) {
+            throw new ErrorHandler(404, "Farmer not found in MongoDB")
+        }
+
+        if (farmer.userId.toString() !== user._id.toString()) {
+            throw new ErrorHandler(401, "You are not Authorised to perform this task");
+        }
+
+        const forum = farmer.forumPost.id(forumId);
+        if (!forum) {
+            throw new ErrorHandler(404, "Forum not exist !!")
+        }
+
+        forum.deleteOne();
+        await farmer.save();
+
+        res.status(200).json({
+            success: true,
+            message: "Forum post deleted successfully",
+        });
+    } catch (error) {
+        throw new ErrorHandler(error.statusCode || 500, error.message)
+    }
 })
