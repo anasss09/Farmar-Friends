@@ -3,6 +3,7 @@ import ErrorWrapper from "../utils/ErrorWrapper.js";
 import getWeather from '../utils/API/Weather.js';
 import getSoil from "../utils/API/Soil.js";
 import Farmer from "../model/farmer.js";
+import { uploadBatchOnCloudinary } from "../utils/upload.js";
 
 export const postWeatherDetails = ErrorWrapper(async (req, res) => {
     try {
@@ -88,7 +89,6 @@ export const postSoilDetails = ErrorWrapper(async (req, res, next) => {
             probability: soilData.properties.probabilities[0].probability,
         };
 
-        // Update farmer document directly
         const updatedFarmer = await Farmer.findOneAndUpdate(
             { userId: user._id },
             {
@@ -99,7 +99,7 @@ export const postSoilDetails = ErrorWrapper(async (req, res, next) => {
             {
                 new: true,
                 runValidators: true
-            } // Return updated document
+            }
         );
 
         if (!updatedFarmer) {
@@ -130,7 +130,7 @@ export const postFarmDetails = ErrorWrapper(async (req, res, next) => {
 
         const farmer = await Farmer.findOne({ userId: req.user._id })
 
-        if(!farmer) {
+        if (!farmer) {
             throw new ErrorHandler(404, "Error in finding farmer")
         }
 
@@ -138,7 +138,7 @@ export const postFarmDetails = ErrorWrapper(async (req, res, next) => {
         const country = farmer?.weather?.country
         const location = state + ", " + country;
 
-        if(!location) {
+        if (!location) {
             throw new ErrorHandler(404, 'Location not found in POSTFARMDETAILS')
         }
 
@@ -155,10 +155,68 @@ export const postFarmDetails = ErrorWrapper(async (req, res, next) => {
         res.status(200).json({
             success: true,
             message: 'Successfully Stored data',
-            farm: farmData
+            farm: farmer.farm
         })
 
     } catch (error) {
         throw new ErrorHandler(error.statusCode || 500, error.message)
     }
+})
+
+export const postAddForum = ErrorWrapper(async (req, res, next) => {
+    try {
+        const { message } = req.body;
+        const user = req.user;
+        const username = user.name;
+        const userImage = user.image;
+
+        if(!message) {
+            throw new ErrorHandler(404, "Enter message")
+        }
+    
+        const farmer = await Farmer.findOne({ userId: user._id })
+
+        if(!farmer) {
+            throw new ErrorHandler(404, 'Error in Forum, Farmer not found')
+        }
+
+        console.log(farmer.userId.toString() )
+
+        if(farmer.userId.toString() !== user._id.toString()) {
+            throw new ErrorHandler(401, 'You are not Authorised to perform this task')
+        }
+
+        const response = await uploadBatchOnCloudinary(req.files);
+        const imageUrl = []
+
+        for(let i=0; i< response.length; i++) {
+            imageUrl.push({
+                url: response[i].url
+            })
+        }
+
+        const forumData = {
+            username: username,
+            userImage: userImage,
+            message: message,
+            farmerId: farmer.userId,
+            images: imageUrl
+        }
+
+        farmer.forumPost.push(forumData);
+        await farmer.save()
+
+        res.status(200).json({
+            success: true,
+            message: 'Message upload Successfully',
+            Farmer_Forum: farmer.forumPost
+        });
+
+    } catch (error) {
+        throw new ErrorHandler(error.statusCode || 500, error.message)
+    }
+})
+
+export const postUpdateForum = ErrorWrapper(async (req, res, next) => {
+
 })

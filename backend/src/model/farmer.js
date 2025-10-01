@@ -79,6 +79,14 @@ const farmerSchema = new Schema(
         username: {
           type: String,
         },
+        farmerId: {
+          type: String,
+        },
+        images: [
+					{
+						url: String,
+					}
+				],
         createdAt: {
           type: Date,
           default: Date.now
