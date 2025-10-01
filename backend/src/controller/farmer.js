@@ -118,10 +118,14 @@ export const postSoilDetails = ErrorWrapper(async (req, res, next) => {
 
 export const postFarmDetails = ErrorWrapper(async (req, res, next) => {
     try {
-        const { soilType, crop, area } = req.body;
+        const { soilType, crops, area } = req.body;
 
-        if(!soilType || !crop || !area) {
-            throw new ErrorHandler(404, "Requires Soil Type, crop, area");
+        const requiredField = ['soilType', 'crops', 'area']
+        const incomingField = Object.keys(req.body);
+        const missingField = requiredField.filter(field => !incomingField.includes(field))
+
+        if (missingField.length > 0) {
+            throw new ErrorHandler(400, `Fills these ${missingField} fields`)
         }
 
         const farmer = await Farmer.findOne({ userId: req.user._id })
@@ -141,7 +145,7 @@ export const postFarmDetails = ErrorWrapper(async (req, res, next) => {
         const farmData = {
             location: location,
             soilType: soilType,
-            crop: crop,
+            crops,
             area: area
         }
 
